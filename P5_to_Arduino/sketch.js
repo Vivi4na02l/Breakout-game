@@ -47,7 +47,7 @@ let rectMarginTop;
 
 let balls = [];
 let isBallOut = false;
-
+let playerX;
 /**
  * size and position of canvas + definiting the port being used to detect the arduino in use
  */
@@ -128,6 +128,7 @@ function setup() {
   }
 
   balls.push(new Ball(window.innerWidth*0.5, height*0.85));
+  playerX = width * 0.5;
 }
  
 function webcamIsReady() {
@@ -477,34 +478,54 @@ function stars() {
 function movingRect(joystick, gameStarted, rectX) {
   let rectangleW = width*0.1;
   let rectangleH = 30;
+  let rectY = height*0.9
   let pinkW = rectangleW * 0.15;
 
   if (!isBallOut) {
-    rectX = window.innerWidth * 0.5;
+    playerX = window.innerWidth * 0.5;
+  } else {
+    playerX = rectX;
   }
 
   stroke('#036280');
   strokeWeight(3);
   fill('#000');
   smooth();
-  rect(rectX, height*0.9, rectangleW, rectangleH);
+  rect(playerX, rectY, rectangleW, rectangleH);
   
   noStroke();
   fill('#FF01A4');
-  rect(rectX-rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
+  rect(playerX-rectangleW*0.3, rectY, pinkW, rectangleH*0.5);
 
   noStroke();
   fill('#FF01A4');
-  rect(rectX+rectangleW*0.3, height*0.9, pinkW, rectangleH*0.5);
+  rect(playerX+rectangleW*0.3, rectY, pinkW, rectangleH*0.5);
 
   noStroke();
   fill('#A48A6C');
-  rect(rectX, height*0.9, pinkW*2, rectangleH*0.5);
+  rect(playerX, rectY, pinkW*2, rectangleH*0.5);
 
   for (let i = 0; i < balls.length; i++) {
     let ball = balls[i];
-    if (ball.bPos.x > rectX - rectangleW / 2 && ball.bPos.x < rectX + rectangleW / 2 && ball.bPos.y + ball.bR > (height*0.9) - rectangleH / 2 && ball.bPos.y < height*0.9) {
-      let newAngleX = map(ball.bPos.x, rectX - rectangleW / 2, rectX + rectangleW / 2, -1, 1);
+
+    // if (ball.collides({rectX: playerX, rectY: rectY, rectW: rectangleW, rectH: rectangleH})) {
+    //   console.log("entrou");
+      
+    //   ball.afterRectangle({rectX: playerX, rectY: rectY, rectW: rectangleW, rectH: rectangleH});
+    // }
+    
+    let playerX_1 = playerX - rectangleW/2; //left on arduino
+    let playerX_2 = playerX + rectangleW/2; //right on arduino
+    if (!joystick) {
+      playerX_1 = width-(playerX + rectangleW/2); //VISUALLY right on ml5.js (because image is mirrored)
+      playerX_2 = width-(playerX - rectangleW/2); //left on ml5.js
+    }
+
+    // console.log(ball.bPos.x, ball.bPos.y, playerX_1, playerX_2, rectY - rectangleH / 2, width);
+
+    if (ball.bPos.x > playerX_1 && ball.bPos.x < playerX_2 && ball.bPos.y + ball.bR > rectY - rectangleH / 2 ) { //&& ball.bPos.y < height*0.9
+      console.log("entrou");
+      let newAngleX = map(ball.bPos.x, playerX - rectangleW / 2, playerX + rectangleW / 2, -1, 1);
       ball.bAngle.set(newAngleX * ball.bSpeed, -ball.bSpeed);
     }
   }
@@ -576,6 +597,8 @@ class Ball {
     this.bPos.add(this.bAngle);
   
     ellipse(this.bPos.x, this.bPos.y, this.bR, this.bR);
+    console.log(this.bPos);
+    
   }
 
   collides(rectangle) {
