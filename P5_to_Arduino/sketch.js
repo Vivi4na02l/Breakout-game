@@ -526,7 +526,7 @@ function movingRect(joystick, gameStarted, rectX) {
     if (ball.bPos.x > playerX_1 && ball.bPos.x < playerX_2 && ball.bPos.y + ball.bR > rectY - rectangleH / 2 ) { //&& ball.bPos.y < height*0.9
       console.log("entrou");
       let newAngleX = map(ball.bPos.x, playerX - rectangleW / 2, playerX + rectangleW / 2, -1, 1);
-      ball.bAngle.set(newAngleX * ball.bSpeed, -ball.bSpeed);
+      ball.bAngle.set(newAngleX, -ball.bSpeed);
     }
   }
 }
