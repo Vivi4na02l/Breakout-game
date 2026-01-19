@@ -34,3 +34,6 @@ The interaction mode can be selected in the initial menu.
 
 ## 📅 Context
 Experimental project developed as part of my academic work.
+
+## 🚀 How to open
+url: https://vivi4na02l.github.io/Breakout-game/P5_to_Arduino/index.html
